@@ -31,6 +31,7 @@ from libs.toolBar import ToolBar
 from libs.zoomWidget import ZoomWidget
 from libs.ImageManagement import loadImageThread, loadOnlineImgMul
 from libs.settingDialog import SettingDialog
+from libs.loginDialog import LoginDialog
 from libs.saveMaskImage import label_mask_writer
 import resources
 
@@ -283,6 +284,8 @@ class MainWindow(QMainWindow, WindowMixin):
         remote_settings = action('&Remote DB Settings', self.setRemoteUrl,
                                  'Ctrl+m', u'set remote url')
         settings = action('Settings', self.setSettings, 'Ctrl+t', u'settings')
+
+        login = action('Login', self.login, 'Ctrl+l' + u'login')
 
         loadOnlineImages = action(
             '&Get Images',
@@ -568,6 +571,7 @@ class MainWindow(QMainWindow, WindowMixin):
              saveAs,
              remote_settings,
              settings,
+             login,
              close,
              None,
              quit))
@@ -761,6 +765,12 @@ class MainWindow(QMainWindow, WindowMixin):
             self.activeTaskMode(setting_state)
             print 'change mode to',setting_state
         settings_dialog.destroy()
+
+    def login(self):
+        login_dialog = LoginDialog(parent=self)
+        if login_dialog.exec_():
+            print login_dialog.get_username()
+        login_dialog.destroy()
 
     def setRemoteUrl(self):
         setRemoteUrldialog = remoteDialog.SetRemoteDialog(parent=self)
