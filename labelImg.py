@@ -871,9 +871,13 @@ class MainWindow(QMainWindow, WindowMixin):
         if self.task_mode == 0:
             for action in self.actions.onDETActive:
                 action.setEnabled(value)
+
+            self.createRect()
         if self.task_mode == 1:
             for action in self.actions.onSEGActive:
                 action.setEnabled(value)
+
+            self.createPolygon()
         if self.task_mode == 0:
             for action in self.actions.onCLSActive:
                 action.setEnabled(value)
