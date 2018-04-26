@@ -76,6 +76,11 @@ class MainWindow(QMainWindow, WindowMixin):
         self.task_mode = 0
         self.mode_str = ['DET','SEG','CLS','BRU']
 
+        # Set username of labeler and show in statusbar
+        self.username = 'anonymous'
+        self.username_widget = QLabel(self.username)
+        self.statusBar().addPermanentWidget(self.username_widget)
+
         # shape type
         self.shape_type = 'RECT'
         # info display
@@ -489,6 +494,7 @@ class MainWindow(QMainWindow, WindowMixin):
             createMode=createMode,
             editMode=editMode,
             advancedMode=advancedMode,
+            changeSavedir=changeSavedir,
             shapeLineColor=shapeLineColor,
             shapeFillColor=shapeFillColor,
             zoom=zoom,
@@ -769,7 +775,8 @@ class MainWindow(QMainWindow, WindowMixin):
     def login(self):
         login_dialog = LoginDialog(parent=self)
         if login_dialog.exec_():
-            print login_dialog.get_username()
+            self.username = login_dialog.get_username()
+            self.username_widget.setText(self.username)
         login_dialog.destroy()
 
     def setRemoteUrl(self):
@@ -1468,7 +1475,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         for root, dirs, files in os.walk(folderPath):
             for file in files:
-                if self.defaultSaveDir[:-1] in root:
+                if self.defaultSaveDir[:-1] in root or 'Annotation' in root:
                     break
                 if file.lower().endswith(tuple(extensions)):
                     relatviePath = os.path.join(root, file)
@@ -1492,7 +1499,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks))
 
         if dirpath is not None and len(dirpath) > 1:
-            self.defaultSaveDir = dirpath
+            self.defaultSaveDir = dirpath + '/' + str(self.username) + '/'
+            print self.defaultSaveDir
 
         self.statusBar().showMessage(
             '%s . Annotation will be saved to %s' %
@@ -1557,7 +1565,7 @@ class MainWindow(QMainWindow, WindowMixin):
             s = '/'
             # self.defaultSaveDir = s.join(
             #     path_elem) + '/Annotation' + '/' + last_path_elem + '/'
-            self.defaultSaveDir = dirpath + '/Annotation/'
+            self.defaultSaveDir = dirpath + '/Annotation/' + str(self.username) + '/'
             if not os.path.exists(self.defaultSaveDir):
                 os.makedirs(self.defaultSaveDir)
                 # for windows
@@ -1579,6 +1587,8 @@ class MainWindow(QMainWindow, WindowMixin):
         for imgPath in self.mImgList:
             item = QListWidgetItem(imgPath)
             self.fileListWidget.addItem(item)
+
+        self.actions.changeSavedir.setEnabled(False)
 
     def openPrevImg(self, _value=False):
         if self.autoSaving is True and self.defaultSaveDir is not None:
@@ -1946,6 +1956,7 @@ def main(argv):
     app.setWindowIcon(newIcon("app"))
     win = MainWindow(argv[1] if len(argv) == 2 else None)
     win.show()
+    win.login()
     return app.exec_()
 
 
