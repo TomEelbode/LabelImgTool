@@ -593,7 +593,11 @@ class Canvas(QWidget):
             self.update()
         elif key == Qt.Key_Return and self.canCloseShape():
             self.finalise()
-
+        elif key == Qt.Key_Escape and not self.current:
+            print "ESC press"
+            self.drawingPolygon.emit(False)
+            self.update()
+            
     def setLastLabel(self, text):
         assert text
         self.shapes[-1].label = text

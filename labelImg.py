@@ -57,7 +57,7 @@ class WindowMixin(object):
     def toolbar(self, title, actions=None):
         toolbar = ToolBar(title)
         toolbar.setObjectName(u'%sToolBar' % title)
-        # toolbar.setOrientation(Qt.Vertical)
+        #toolbar.setOrientation(Qt.Vertical)
         toolbar.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         if actions:
             addActions(toolbar, actions)
@@ -280,6 +280,7 @@ class MainWindow(QMainWindow, WindowMixin):
         remote_settings = action('&Remote DB Settings', self.setRemoteUrl,
                                  'Ctrl+m', u'set remote url')
         settings = action('Settings', self.setSettings, 'Ctrl+t', u'settings')
+
         loadOnlineImages = action(
             '&Get Images',
             self.loadOnlineImages,
@@ -290,7 +291,7 @@ class MainWindow(QMainWindow, WindowMixin):
         createPolygon = action(
             '&Create\nPolygon',
             self.createPolygon,
-            'Ctrl+p',
+            'p',
             icon='new',
             tip=u'create polygon',
             enabled=False)
@@ -343,7 +344,8 @@ class MainWindow(QMainWindow, WindowMixin):
             enabled=False)
 
         createRect = action('Create\nRectBox', self.createRect,
-                        'Ctrl+N', 'new', u'Draw a new Box', enabled=False)
+                        'r', 'new', u'Draw a new Box', enabled=False)
+
         delete = action('Delete\nShape', self.deleteSelectedShape,
                         'Delete', 'delete', u'Delete', enabled=False)
         copy = action(
@@ -385,12 +387,12 @@ class MainWindow(QMainWindow, WindowMixin):
             partial(
                 self.addZoom,
                 10),
-            'Ctrl++',
+            '+',
             'zoom-in',
             u'Increase zoom level',
             enabled=False)
         zoomOut = action('&Zoom Out', partial(self.addZoom, -10),
-                         'Ctrl+-', 'zoom-out', u'Decrease zoom level', enabled=False)
+                         '-', 'zoom-out', u'Decrease zoom level', enabled=False)
         zoomOrg = action(
             '&Original size',
             partial(
@@ -401,7 +403,7 @@ class MainWindow(QMainWindow, WindowMixin):
             u'Zoom to original size',
             enabled=False)
         fitWindow = action('&Fit Window', self.setFitWindow,
-                           'Ctrl+F', 'fit-window', u'Zoom follows window size',
+                           'f', 'fit-window', u'Zoom follows window size',
                            checkable=True, enabled=False)
         fitWidth = action(
             'Fit &Width',
@@ -936,7 +938,10 @@ class MainWindow(QMainWindow, WindowMixin):
             self.canvas.setEditing(True)
             self.canvas.restoreCursor()
             self.actions.createMode.setEnabled(True)
-            self.actions.createpolygon.setEnabled(True)
+            if self.task_mode == 0:
+                self.actions.createRect.setEnabled(True)
+            elif self.task_mode == 1: 
+                self.actions.createpolygon.setEnabled(True)
 
     def toggleDrawMode(self, edit=True):
         self.canvas.setEditing(edit)
