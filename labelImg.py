@@ -1441,6 +1441,8 @@ class MainWindow(QMainWindow, WindowMixin):
 
         for root, dirs, files in os.walk(folderPath):
             for file in files:
+                if self.defaultSaveDir[:-1] in root:
+                    break
                 if file.lower().endswith(tuple(extensions)):
                     relatviePath = os.path.join(root, file)
                     images.append(os.path.abspath(relatviePath))
@@ -1526,8 +1528,9 @@ class MainWindow(QMainWindow, WindowMixin):
             path_elem = dirpath.split('/')[:-2]
             last_path_elem = dirpath.split('/')[-1]
             s = '/'
-            self.defaultSaveDir = s.join(
-                path_elem) + '/Annotation' + '/' + last_path_elem + '/'
+            # self.defaultSaveDir = s.join(
+            #     path_elem) + '/Annotation' + '/' + last_path_elem + '/'
+            self.defaultSaveDir = dirpath + '/Annotation/'
             if not os.path.exists(self.defaultSaveDir):
                 os.makedirs(self.defaultSaveDir)
                 # for windows
