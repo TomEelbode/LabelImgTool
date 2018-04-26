@@ -8,6 +8,7 @@ class SettingDialog(QtGui.QDialog):
     label_font_size = 10
     task_mode = 0 #0=det, 1=seg, 2=cls
     instance_seg_flag = False
+    binary_mode = False
 
 
     def __init__(self, parent,config):
@@ -15,6 +16,7 @@ class SettingDialog(QtGui.QDialog):
         self.resize(320, 240)
         self.__class__.task_mode = config['task_mode']
         self.__class__.label_font_size = config['label_font_size']
+        self.__class__.binary_mode = config['binary']
         self.init_UI()
     def createModeGroup(self):
         '''
@@ -22,7 +24,7 @@ class SettingDialog(QtGui.QDialog):
         :return: mode group
         '''
         self.modegroupBox = QtGui.QGroupBox("& Task Mode")
-        self.modegroupBox.setCheckable(True)
+        self.modegroupBox.setCheckable(False)
         self.modegroupBox.setChecked(True)
         self.CLS_mode_rb = QtGui.QRadioButton("CLS Mode")
         self.CLS_mode_rb.clicked.connect(self.CLS_model_selected)
@@ -33,11 +35,16 @@ class SettingDialog(QtGui.QDialog):
         self.BRU_mode_rb = QtGui.QRadioButton("BRU Mode")
         self.BRU_mode_rb.clicked.connect(self.BRU_model_selected)
 
+        self.binary_mode_cb = QtGui.QCheckBox("Binary mode")
+        self.binary_mode_cb.setChecked(self.__class__.binary_mode)
+        self.binary_mode_cb.stateChanged.connect(self.change_binary_mode)
+
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(self.CLS_mode_rb)
         vbox.addWidget(self.DET_mode_rb)
         vbox.addWidget(self.SEG_mode_rb)
         vbox.addWidget(self.BRU_mode_rb)
+        vbox.addWidget(self.binary_mode_cb)
         vbox.addStretch(True)
         self.modegroupBox.setLayout(vbox)
         return self.modegroupBox
@@ -168,16 +175,31 @@ class SettingDialog(QtGui.QDialog):
         self.detgroupBox.setDisabled(True)
         self.clsgroupBox.setDisabled(True)
 
+    def binary_mode_toggled(self):
+        if self.__class__.binary_mode == True:
+            self.__class__.binary_mode = False
+        else:
+            self.__class__.binary_mode = True
+
     def change_color_enable_state(self, state):
         if state == QtCore.Qt.Checked:
             self.__class__.enable_color_map = True
         else:
             self.__class__.enable_color_map = False
+
     def change_instance_seg_label(self,state):
         if state == QtCore.Qt.Checked:
             self.__class__.instance_seg_flag = True
         else:
             self.__class__.instance_seg_flag = False
+
+    def change_binary_mode(self, state):
+        if state == QtCore.Qt.Checked:
+            self.__class__.binary_mode = True
+        else:
+            self.__class__.binary_mode = False
+
+
     def change_label_font_size(self,value):
         self.__class__.label_font_size = value
 
@@ -186,13 +208,13 @@ class SettingDialog(QtGui.QDialog):
 
     def get_setting_state(self):
         if self.__class__.task_mode == 0:
-            return {'mode': 0,'enable_color_map':self.__class__.enable_color_map,'label_font_size': self.__class__.label_font_size}
+            return {'mode': 0,'enable_color_map':self.__class__.enable_color_map,'label_font_size': self.__class__.label_font_size, 'binary':self.__class__.binary_mode}
 
         elif self.__class__.task_mode == 1:
-            return {'mode': 1,'enable_color_map':self.__class__.enable_color_map,'instance_seg_flag':self.instance_seg_flag}
+            return {'mode': 1,'enable_color_map':self.__class__.enable_color_map,'instance_seg_flag':self.instance_seg_flag, 'binary':self.__class__.binary_mode}
 
         elif self.__class__.task_mode == 2:
-            return {'mode': 2}
+            return {'mode': 2, 'binary':self.__class__.binary_mode}
         elif self.__class__.task_mode == 3:
-            return {'mode': 3}
+            return {'mode': 3, 'binary':self.__class__.binary_mode}
 

@@ -93,6 +93,9 @@ class MainWindow(QMainWindow, WindowMixin):
         #instance seg
         self.enable_instance_seg = False
         self.current_instance_id = 0
+        # binary mode - whether or not there is more than one label to assign (is a lot faster than selecting the same label each time from the popup list)
+        self.binary_mode = False
+
         # online database
         self.database_url = None
         self.connect_remote_db = None
@@ -625,6 +628,7 @@ class MainWindow(QMainWindow, WindowMixin):
         settings = self.app_settings
 
         self.task_mode = int(settings.get(SETTING_TASK_MODE,0))
+        self.binary_mode = bool(settings.get(SETTING_BINARY,True))
         self.canvas.task_mode = self.task_mode
         self.label_font_size = int(settings.get(SETTING_LABEL_FONT_SIZE,10))
         self.activeTaskMode()
@@ -735,7 +739,7 @@ class MainWindow(QMainWindow, WindowMixin):
             self.labelSelectDock.setEnabled(True)
 
     def setSettings(self):
-        config = {'task_mode':self.task_mode,'label_font_size':self.label_font_size}
+        config = {'task_mode':self.task_mode,'label_font_size':self.label_font_size, 'binary':self.binary_mode}
         settings_dialog = SettingDialog(parent=self,config = config)
         if settings_dialog.exec_():
             self.enable_color_map = settings_dialog.get_color_map_state()
@@ -752,6 +756,8 @@ class MainWindow(QMainWindow, WindowMixin):
                     self.canvas.update()
             elif self.task_mode == 1:
                 self.enable_instance_seg = setting_state['instance_seg_flag']
+
+            self.binary_mode = setting_state['binary']
             self.activeTaskMode(setting_state)
             print 'change mode to',setting_state
         settings_dialog.destroy()
@@ -1191,8 +1197,17 @@ class MainWindow(QMainWindow, WindowMixin):
                 listItem=self.labelHist,
                 label_fre_dic=self.label_fre_dic)
 
-        text = self.labelDialog.popUp()
-        text = str(text)
+        if not self.binary_mode:
+            text = self.labelDialog.popUp()
+            text = str(text)
+        else:
+            if self.label_sub_dic:
+                text = self.label_sub_dic[0]
+            elif len(self.labelHist) > 0 :
+                text = self.labelHist[0]
+            else:
+                text = 'Object'
+
         if text is not None:
 
             if str(text) in self.label_fre_dic:
@@ -1418,6 +1433,8 @@ class MainWindow(QMainWindow, WindowMixin):
         settings[SETTING_FILL_COLOR] = self.fillColor
         settings[SETTING_RECENT_FILES] = self.recentFiles
         settings[SETTING_ADVANCE_MODE] = not self._beginner
+        settings[SETTING_BINARY] = self.binary_mode
+
         if self.defaultSaveDir is not None and len(self.defaultSaveDir) > 1:
             settings[SETTING_SAVE_DIR] = ustr(self.defaultSaveDir)
         else:
