@@ -5,7 +5,8 @@ from PyQt4.QtCore import *
 
 
 def newIcon(icon):
-    return QIcon(':/' + icon)
+    result = QIcon('icons/' + icon + '.png')
+    return result
 
 
 def newButton(text, icon=None, slot=None):

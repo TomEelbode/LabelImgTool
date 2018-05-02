@@ -11,6 +11,8 @@ SETTING_SAVE_DIR = 'savedir'
 SETTING_LAST_OPEN_DIR = 'lastOpenDir'
 SETTING_TASK_MODE = 'task_mode'
 SETTING_BINARY = 'binary'
+SETTING_FRAMESTOSKIP = 'framestoskip'
+SETTING_COPYPREVPRED = 'copyprevdev'
 SETTING_LABEL_FONT_SIZE = 'det/label_font_size'
 COLORMAP = {0: [0, 0, 0], 1: [120, 120, 120], 2: [180, 120, 120], 3: [6, 230, 230], 4: [80, 50, 50], 5: [4, 200, 3],
                6: [120, 120, 80], 7: [140, 140, 140], 8: [204, 5, 255], 9: [230, 230, 230], 10: [4, 250, 7],

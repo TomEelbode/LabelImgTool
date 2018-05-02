@@ -26,7 +26,8 @@ class LabelFile(object):
             shapes,
             imagePath=None,
             databaseSrc=None,
-            shape_type_='RECT'):
+            shape_type_='RECT',
+            framegrabber = None):
         imgFolderPath = os.path.dirname(imagePath)
         imgFolderName = os.path.split(imgFolderPath)[-1]
         imgFileName = os.path.basename(imagePath)
@@ -38,7 +39,9 @@ class LabelFile(object):
             imgFileNameWithoutExt,
             image_size,
             localImgPath=imagePath,
-            shape_type=shape_type_)
+            shape_type=shape_type_,
+            framegrabber=framegrabber,
+            savefilename=savefilename)
         bSave = False
         for shape in shapes:
             points = shape['points']
