@@ -314,7 +314,9 @@ class MainWindow(QMainWindow, WindowMixin):
                                  'Ctrl+m', u'set remote url')
         settings = action('Settings', self.setSettings, 'Ctrl+t', u'settings')
 
-        login = action('Login', self.login, 'Ctrl+l' + u'login')
+        login = action('Login', self.login, 'Ctrl+l', u'login')
+
+        gotobeginning = action('Go to start', self.goToBeginning, 'Ctrl+left', u'gotostart')
 
         loadOnlineImages = action(
             '&Get Images',
@@ -586,7 +588,7 @@ class MainWindow(QMainWindow, WindowMixin):
         addActions(self.menus.help, (help, ))
         addActions(self.menus.view,
                    (advancedMode, None, hideAll, showAll, None, zoomIn,
-                    zoomOut, zoomOrg, None, fitWindow, fitWidth))
+                    zoomOut, zoomOrg, None, fitWindow, fitWidth, None, gotobeginning))
 
         self.menus.file.aboutToShow.connect(self.updateFileMenu)
 
@@ -1336,6 +1338,56 @@ class MainWindow(QMainWindow, WindowMixin):
         mask_img = QImage(filepath)
         self.canvas.loadMaskmap(mask_img)
 
+    def goToBeginningOfVideo(self):
+        self.resetState()
+        self.filename = self.video_filename
+        self.canvas.setEnabled(False)
+
+        cvimage = self.frame_grabber.get_frame(0)
+
+        height, width, channel = cvimage.shape
+        bytesPerLine = 3 * width
+        image = QImage(cvimage.data, width, height, bytesPerLine,
+                       QImage.Format_RGB888)
+
+        self.image = image
+        self.image_size = []
+        self.image_size.append(image.height())
+        self.image_size.append(image.width())
+        self.image_size.append(1 if image.isGrayscale() else 3)
+
+        self.canvas.loadPixmap(image)
+        self.setClean()
+        self.canvas.setEnabled(True)
+        self.adjustScale(initial=True)
+        self.paintCanvas()
+        self.addRecentFile(self.filename)
+        self.toggleActions(True)
+
+        # self.progressbar.setValue(self.frame_grabber.get_position())
+
+        # Label xml file and show bound box according to its filename
+        basename = os.path.basename(os.path.splitext(self.filename)[0])
+        if self.task_mode in [0, 1]:
+            if self.usingPascalVocFormat is True and \
+                    self.defaultSaveDir is not None:
+                xmlPath = os.path.join(self.defaultSaveDir,
+                                       basename + '.xml')
+                self.loadPascalXMLByFilename(xmlPath)
+                if self.shape_type == 'POLYGON':
+                    self.canvas.set_shape_type(1)
+                elif self.shape_type == 'RECT':
+                    self.canvas.set_shape_type(0)
+        elif self.task_mode == 2:
+            if self.defaultSaveDir is not None:
+                txtPath = os.path.join(self.defaultSaveDir,
+                                       basename + '.txt')
+                self.loadCLSFile(txtPath)
+
+        self.progressbar.setValue(self.getNumberOfAnnotatedFramesFromXML(xmlPath)*self.framesToSkip)
+
+        return True
+
     def showNextFrame(self):
         self.resetState()
         self.filename = self.video_filename
@@ -1746,6 +1798,24 @@ class MainWindow(QMainWindow, WindowMixin):
                 filename = self.mImgList[currIndex - 1]
                 if filename:
                     self.loadFile(filename)
+
+    def goToBeginning(self):
+        if self.autoSaving is True and self.defaultSaveDir is not None and not self.image.isNull(
+        ):
+            if self.dirty is True or self.task_mode == 3:
+                self.saveFile()
+
+        if self.video_mode:
+            self.goToBeginningOfVideo()
+        else:
+            if len(self.mImgList) <= 0:
+                return
+
+            self.progressbar.setValue(0)
+            filename = self.mImgList[0]
+
+            if filename:
+                self.loadFile(filename)
 
     def openNextImg(self, _value=False):
         # Proceding next image without dialog if having any label
