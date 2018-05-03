@@ -145,6 +145,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.video_mode = False
         self.framesToSkip = 0
         self.copyprevpred = False
+        self.annotated_frames = 0
 
         # Whether we need to save or not.
         self.dirty = False
@@ -920,6 +921,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.video_filename = None
         self.frame_grabber = None
         self.video_mode = False
+        self.annotated_frames = 0
 
     def currentItem(self):
         items = self.labelList.selectedItems()
@@ -1070,6 +1072,7 @@ class MainWindow(QMainWindow, WindowMixin):
             print(shapes)
             for label, points, line_color, fill_color, shape_type, instance_id, frame in shapes:
                 if self.frame_grabber is not None and not frame == self.frame_grabber.get_position():
+                    print frame, self.frame_grabber.get_position()
                     continue
                 shape = Shape(
                     label=label,
@@ -1348,8 +1351,6 @@ class MainWindow(QMainWindow, WindowMixin):
             self.addRecentFile(self.filename)
             self.toggleActions(True)
 
-            self.progressbar.setValue(self.frame_grabber.get_position())
-
             # Label xml file and show bound box according to its filename
             basename = os.path.basename(os.path.splitext(self.filename)[0])
             if self.task_mode in [0, 1]:
@@ -1368,11 +1369,11 @@ class MainWindow(QMainWindow, WindowMixin):
                                            basename + '.txt')
                     self.loadCLSFile(txtPath)
 
+            self.progressbar.setValue(self.getNumberOfAnnotatedFramesFromXML(xmlPath)*self.framesToSkip)
             return True
         else:
             QMessageBox.about(self, "No more images!",
                               "This was the last image.")
-            self.progressbar.setValue(self.progressbar.maximum())
             return False
 
     def showPrevFrame(self):
@@ -1381,7 +1382,6 @@ class MainWindow(QMainWindow, WindowMixin):
         self.canvas.setEnabled(False)
 
         cvimage = self.frame_grabber.previous(self.framesToSkip)
-        print self.frame_grabber.get_position()
 
         height, width, channel = cvimage.shape
         bytesPerLine = 3 * width
@@ -1402,7 +1402,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.addRecentFile(self.filename)
         self.toggleActions(True)
 
-        self.progressbar.setValue(self.frame_grabber.get_position())
+        # self.progressbar.setValue(self.frame_grabber.get_position())
 
         # Label xml file and show bound box according to its filename
         basename = os.path.basename(os.path.splitext(self.filename)[0])
@@ -1421,6 +1421,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 txtPath = os.path.join(self.defaultSaveDir,
                                        basename + '.txt')
                 self.loadCLSFile(txtPath)
+
+        self.progressbar.setValue(self.getNumberOfAnnotatedFramesFromXML(xmlPath)*self.framesToSkip)
 
         return True
 
@@ -1473,7 +1475,7 @@ class MainWindow(QMainWindow, WindowMixin):
             self.image_size.append(image.height())
             self.image_size.append(image.width())
             self.image_size.append(1 if image.isGrayscale() else 3)
-            print self.image_size
+
             self.filename = filename
             self.canvas.loadPixmap(image)
             if self.labelFile:
@@ -1725,7 +1727,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 return
 
             currIndex = self.mImgList.index(self.filename)
-            self.progressbar.setValue(currIndex+1)
+            self.progressbar.setValue(currIndex-1)
             if currIndex - 1 >= 0:
                 filename = self.mImgList[currIndex - 1]
                 if filename:
@@ -2037,6 +2039,21 @@ class MainWindow(QMainWindow, WindowMixin):
         self.loadLabels(shapes)
         self.shape_type = tVocParseReader.getShapeType()
 
+    def getNumberOfAnnotatedFramesFromXML(self, filename):
+        if self.filename is None:
+            return 0
+        if os.path.exists(filename) is False:
+            return 0
+
+        tVocParseReader = PascalVocReader(filename)
+        shapes = tVocParseReader.getShapes()
+        annotated_frames = []
+        for label, points, color1, color2, shape_type, instance_id, frame in shapes:
+            if frame not in annotated_frames:
+                annotated_frames.append(frame)
+        return len(annotated_frames)
+
+
     def loadVideo(self):
         print "Loading video"
 
@@ -2080,7 +2097,9 @@ class MainWindow(QMainWindow, WindowMixin):
             print "Total video duration is " + str(
                 self.frame_grabber.get_duration())
 
-            self.showNextFrame()
+            self.progressbar.setRange(0,self.frame_grabber.get_nframes())
+            # self.showNextFrame()
+            self.showPrevFrame() # if you use shownextframe, the starting frame is not correct
 
         config = {
             'framestoskip': self.framesToSkip,
@@ -2090,10 +2109,18 @@ class MainWindow(QMainWindow, WindowMixin):
         if dialog.exec_():
             self.framesToSkip = dialog.get_framesToSkip()
             self.copyprevpred = dialog.get_copyprevpred()
+            overwritable = dialog.get_overwritable()
         dialog.destroy()
 
-        self.progressbar.setRange(0,self.frame_grabber.get_nframes())
+        # get labelfile
+        imgFileName = os.path.basename(self.filename)
+        savedFileName = os.path.splitext(imgFileName)[0] + LabelFile.suffix
+        savedPath = os.path.join(str(self.defaultSaveDir), savedFileName)
 
+        if overwritable and os.path.exists(savedPath):
+            os.remove(savedPath)
+
+        self.annotated_frames = self.getNumberOfAnnotatedFramesFromXML(savedPath)
 
 class Settings(object):
     """Convenience dict-like wrapper around QSettings."""

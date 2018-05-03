@@ -10,6 +10,7 @@ class NewVideoDialog(QDialog):
     """docstring for NewVideoDialog"""
     framestoskip = 0
     copyprevpred = False
+    overwrite = False
 
     def __init__(self, parent=None, frameGrabber=None, config=None):
         super(NewVideoDialog, self).__init__(parent)
@@ -42,6 +43,11 @@ class NewVideoDialog(QDialog):
         hline.setFrameShape(QFrame.HLine)
         hline.setFrameShadow(QFrame.Sunken)
 
+        hline2 = QFrame()
+        hline.setFrameShape(QFrame.HLine)
+        hline2.setFrameShadow(QFrame.Sunken)
+
+
         # Input how many frames to skip for annotation
         self.framestoskip = QLineEdit(parent=parent)
         self.framestoskip.setValidator(QIntValidator())
@@ -61,6 +67,12 @@ class NewVideoDialog(QDialog):
         self.copyprevpred_cb.setChecked(self.__class__.copyprevpred)
         self.copyprevpred_cb.stateChanged.connect(self.change_copyprevpred)
 
+        # Check button indicating whether or not to overwrite already existing
+        # label file
+        self.overwrite_cb = QtGui.QCheckBox("Overwrite existing label file")
+        self.overwrite_cb.setChecked(self.__class__.overwrite)
+        self.overwrite_cb.stateChanged.connect(self.change_overwrite)
+
         # Add elements to layout
         formlayout = QFormLayout()
         formlayout.addRow(self.explanation)
@@ -74,6 +86,8 @@ class NewVideoDialog(QDialog):
 
         formlayout.addRow("Frames to skip", self.framestoskip)
         formlayout.addRow(self.copyprevpred_cb)
+        formlayout.addRow(hline2)
+        formlayout.addRow(self.overwrite_cb)
 
         layout = QVBoxLayout()
         layout.addLayout(formlayout, 1)
@@ -90,6 +104,9 @@ class NewVideoDialog(QDialog):
     def get_copyprevpred(self):
         return self.__class__.copyprevpred
 
+    def get_overwritable(self):
+        return self.__class__.overwrite
+
     def validate(self):
         self.accept()
 
@@ -98,3 +115,11 @@ class NewVideoDialog(QDialog):
             self.__class__.copyprevpred = True
         else:
             self.__class__.copyprevpred = False
+
+    def change_overwrite(self, state):
+        if state == QtCore.Qt.Checked:
+            self.__class__.overwrite = True
+        else:
+            self.__class__.overwrite = False
+
+

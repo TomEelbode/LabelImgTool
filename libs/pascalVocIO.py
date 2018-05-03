@@ -125,7 +125,7 @@ class PascalVocWriter:
 
     def appendObjects(self, top):
         for each_object in self.boxlist:
-            print(each_object)
+            # print(each_object)
             object_item = SubElement(top, 'object')
             if each_object['name']:
                 name = SubElement(object_item, 'name')
@@ -182,7 +182,7 @@ class PascalVocWriter:
 class PascalVocReader:
     def __init__(self, filepath):
         # shapes type:
-        ## [labbel, [(x1,y1), (x2,y2), (x3,y3), (x4,y4)], color, color]
+        ## [label, [(x1,y1), (x2,y2), (x3,y3)], color, color, shape_type, instance_id, frame]
         self.shapes = []
         self.filepath = filepath
         self.shape_type = None
@@ -248,6 +248,8 @@ class PascalVocReader:
 
                 if object_iter.find('frame') is not None:
                     frame = int(object_iter.find('frame').text)
+                else:
+                    frame = None
                 self.addPolygonShape(label, points, instance_id, frame)
         else:
             print 'unsupportable shape type'
