@@ -2153,6 +2153,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         if overwritable and os.path.exists(savedPath):
             os.remove(savedPath)
+            self.showPrevFrame()
 
         self.annotated_frames = self.getNumberOfAnnotatedFramesFromXML(savedPath)
 
