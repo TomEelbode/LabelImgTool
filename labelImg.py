@@ -736,7 +736,6 @@ class MainWindow(QMainWindow, WindowMixin):
             # self.labelSelectDock.setEnabled(True)
 
     def setSettings(self):
-        print 'binary mode ' + str(self.binary_mode)
         config = {
             'task_mode': self.task_mode,
             'label_font_size': self.label_font_size,
@@ -1066,14 +1065,26 @@ class MainWindow(QMainWindow, WindowMixin):
             del self.shapesToItems[label]
             del self.itemsToShapes[item]
 
-    def loadLabels(self, shapes):
+    def loadLabels(self, shapes, forward=False):
         s = []
         if self.task_mode in [0, 1]:
-            print(shapes)
+            # print(shapes)
             for label, points, line_color, fill_color, shape_type, instance_id, frame in shapes:
-                if self.frame_grabber is not None and not frame == self.frame_grabber.get_position():
-                    print frame, self.frame_grabber.get_position()
-                    continue
+                if self.frame_grabber is not None:
+                    if frame == self.frame_grabber.get_position():
+                        # this annotation must be shown
+                        pass
+                    elif self.copyprevpred and forward and (frame + self.framesToSkip + 1 == self.frame_grabber.get_position()):
+                        # this annotation must be shown if the current frame
+                        # doesn't have its own annotation yet
+                        annotated_frames = [i[-1] for i in shapes]
+                        if self.frame_grabber.get_position() in annotated_frames:
+                            continue
+                        else:
+                            # show annotation and make sure it will be saved
+                            self.setDirty()
+                    else:
+                        continue
                 shape = Shape(
                     label=label,
                     shape_type=shape_type,
@@ -1166,7 +1177,7 @@ class MainWindow(QMainWindow, WindowMixin):
             savefilename = os.path.join(
                 self.defaultSaveDir + os.path.splitext(imgFileName)[0] +
                 '.txt')  # the mask image will be save as file_mask.jpg etc.
-            print savefilename
+            # print savefilename
             with codecs.open(savefilename, 'w', 'utf8') as outfile:
                 for item in self.currentItemLabels:
                     outfile.write(item + '\n')
@@ -1358,7 +1369,7 @@ class MainWindow(QMainWindow, WindowMixin):
                         self.defaultSaveDir is not None:
                     xmlPath = os.path.join(self.defaultSaveDir,
                                            basename + '.xml')
-                    self.loadPascalXMLByFilename(xmlPath)
+                    self.loadPascalXMLByFilename(xmlPath, forward=True)
                     if self.shape_type == 'POLYGON':
                         self.canvas.set_shape_type(1)
                     elif self.shape_type == 'RECT':
@@ -1599,7 +1610,7 @@ class MainWindow(QMainWindow, WindowMixin):
                     relatviePath = os.path.join(root, file)
                     images.append(os.path.abspath(relatviePath))
         images.sort(key=lambda x: x.lower())
-        print images
+        # print images
         return images
 
     def changeSavedir(self, _value=False):
@@ -1615,7 +1626,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         if dirpath is not None and len(dirpath) > 1:
             self.defaultSaveDir = dirpath + '/' + str(self.username) + '/'
-            print self.defaultSaveDir
+            # print self.defaultSaveDir
 
         self.statusBar().showMessage('%s . Annotation will be saved to %s' %
                                      ('Change saved folder',
@@ -1799,7 +1810,7 @@ class MainWindow(QMainWindow, WindowMixin):
                                if self.labelFile else self.saveFileDialog())
         elif self.task_mode == 3:
             self._saveFile(self.filename)
-        else:
+        elif not self.video_mode:
             imgFileName = os.path.basename(self.filename)
             if self.task_mode in [0, 1]:
                 savedFileName = os.path.splitext(
@@ -1900,7 +1911,30 @@ class MainWindow(QMainWindow, WindowMixin):
         if yes == QMessageBox.warning(self, u'Attention', msg, yes | no):
             self.remLabel(
                 shape=self.canvas.deleteSelected(), label=self.selectedLabel)
+
+            try:
+
+                if self.usingPascalVocFormat is True:
+                    shapes = [format_shape(shape) for shape in self.canvas.shapes]
+                    imgFileName = os.path.basename(self.filename)
+                    savefilename = os.path.join(
+                            self.defaultSaveDir,
+                            os.path.splitext(imgFileName)[0] + '.xml'
+                            )  # the mask image will be save as file_mask.jpg etc.
+
+                    LabelFile().removeCurrentFrameLabels(
+                        savefilename,
+                        self.image_size,
+                        shapes,
+                        unicode(self.filename),
+                        shape_type_=self.shape_type,
+                        framegrabber=self.frame_grabber)
+            except LabelFileError as e:
+                self.errorMessage(u'Error saving label data', u'<b>%s</b>' % e)
+                return False
+
             self.setDirty()
+
             if self.noShapes():
                 for action in self.actions.onShapesPresent:
                     action.setEnabled(False)
@@ -2026,7 +2060,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.label_num_dic[label] = num
                 num += 1
 
-    def loadPascalXMLByFilename(self, filename):
+    def loadPascalXMLByFilename(self, filename, forward=False):
         if self.filename is None:
             return
         if os.path.exists(filename) is False:
@@ -2036,7 +2070,7 @@ class MainWindow(QMainWindow, WindowMixin):
         shapes = tVocParseReader.getShapes()
         instance_ids = [shape[-1] for shape in shapes]
         self.current_instance_id = max(instance_ids)
-        self.loadLabels(shapes)
+        self.loadLabels(shapes, forward=forward)
         self.shape_type = tVocParseReader.getShapeType()
 
     def getNumberOfAnnotatedFramesFromXML(self, filename):
@@ -2099,7 +2133,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
             self.progressbar.setRange(0,self.frame_grabber.get_nframes())
             # self.showNextFrame()
-            self.showPrevFrame() # if you use shownextframe, the starting frame is not correct
+            self.showPrevFrame() # if you use shownextframe, the starting frame is not correct=
 
         config = {
             'framestoskip': self.framesToSkip,

@@ -65,6 +65,56 @@ class LabelFile(object):
             writer.save(targetFile=savefilename)
         return
 
+    def removeCurrentFrameLabels(
+        self,
+        savefilename,
+        image_size,
+        shapes,
+        imagePath=None,
+        databaseSrc=None,
+        shape_type_='RECT',
+        framegrabber=None):
+
+        imgFolderPath = os.path.dirname(imagePath)
+        imgFolderName = os.path.split(imgFolderPath)[-1]
+        imgFileName = os.path.basename(imagePath)
+        imgFileNameWithoutExt = os.path.splitext(imgFileName)[0]
+
+        #img = cv2.imread(imagePath)
+        writer = PascalVocWriter(
+            imgFolderName,
+            imgFileNameWithoutExt,
+            image_size,
+            localImgPath=imagePath,
+            shape_type=shape_type_,
+            framegrabber=framegrabber,
+            savefilename=savefilename)
+        bSave = False
+        for shape in shapes:
+            points = shape['points']
+            label = shape['label']
+            if shape['shape_type'] == 0:
+                print 'add rects'
+                bndbox = LabelFile.convertPoints2BndBox(points)
+                writer.addBndBox(
+                    bndbox[0],
+                    bndbox[1],
+                    bndbox[2],
+                    bndbox[3],
+                    label)
+            if shape['shape_type'] == 1:
+                print 'add polygons'
+                writer.addPolygon(points, label,instance_id=shape['instance_id'])
+
+            bSave = True
+
+        if bSave:
+
+            writer.removeCurrentFrameAnnotation()
+            writer.save(targetFile=savefilename)
+        return
+
+
     @staticmethod
     def isLabelFile(filename):
         fileSuffix = os.path.splitext(filename)[1].lower()

@@ -36,9 +36,13 @@ class PascalVocWriter:
             reader = PascalVocReader(savefilename)
             shapes = reader.getShapes()
 
+            print shapes
             for label, points, line_color, fill_color, shape_type, instance_id, frame in shapes:
                 if not frame == self.framegrabber.get_position():
-                    self.addPolygon(points, label, instance_id, frame)
+                    if self.shape_type == 'RECT':
+                        self.addBndBox(points[0][0], points[0][1], points[2][0], points[2][1], label, frame)
+                    else:
+                        self.addPolygon(points, label, instance_id, frame)
 
     def prettify(self, elem):
         """
@@ -106,9 +110,10 @@ class PascalVocWriter:
         shape_type.text = self.shape_type
         return top
 
-    def addBndBox(self, xmin, ymin, xmax, ymax, name):
+    def addBndBox(self, xmin, ymin, xmax, ymax, name, frame=None):
         bndbox = {'xmin': xmin, 'ymin': ymin, 'xmax': xmax, 'ymax': ymax}
         bndbox['name'] = name
+        bndbox['frame'] = frame
         self.boxlist.append(bndbox)
 
     def addPolygon(self, shape, name, instance_id, frame=None):
@@ -122,6 +127,9 @@ class PascalVocWriter:
         polygon['instance_id'] = instance_id
         polygon['frame'] = frame
         self.boxlist.append(polygon)
+
+    def removeCurrentFrameAnnotation(self):
+        self.boxlist = [x for x in self.boxlist if x['frame'] != self.framegrabber.get_position()]
 
     def appendObjects(self, top):
         for each_object in self.boxlist:
@@ -149,6 +157,7 @@ class PascalVocWriter:
             difficult = SubElement(object_item, 'difficult')
             difficult.text = "0"
             if self.shape_type == 'RECT':
+                # print each_object
                 bndbox = SubElement(object_item, 'bndbox')
                 xmin = SubElement(bndbox, 'xmin')
                 xmin.text = str(each_object['xmin'])
@@ -228,10 +237,12 @@ class PascalVocReader:
                 bndbox = object_iter.find("bndbox")
                 rects.append([int(it.text) for it in bndbox])
                 label = object_iter.find('name').text
+
                 if object_iter.find('frame') is not None:
                     frame = int(object_iter.find('frame').text)
+
                 for rect in rects:
-                    self.addShape(label, rect, frame)
+                    self.addShape(label, rect, frame=frame)
 
             return True
         elif self.shape_type == 'POLYGON':
@@ -250,7 +261,7 @@ class PascalVocReader:
                     frame = int(object_iter.find('frame').text)
                 else:
                     frame = None
-                self.addPolygonShape(label, points, instance_id, frame)
+                self.addPolygonShape(label, points, instance_id, frame=frame)
         else:
             print 'unsupportable shape type'
 
