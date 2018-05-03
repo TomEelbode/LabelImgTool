@@ -14,6 +14,7 @@ SETTING_BINARY = 'binary'
 SETTING_FRAMESTOSKIP = 'framestoskip'
 SETTING_COPYPREVPRED = 'copyprevdev'
 SETTING_LABEL_FONT_SIZE = 'det/label_font_size'
+SETTING_USERNAME = 'username'
 COLORMAP = {0: [0, 0, 0], 1: [120, 120, 120], 2: [180, 120, 120], 3: [6, 230, 230], 4: [80, 50, 50], 5: [4, 200, 3],
                6: [120, 120, 80], 7: [140, 140, 140], 8: [204, 5, 255], 9: [230, 230, 230], 10: [4, 250, 7],
                11: [224, 5, 255], 12: [235, 255, 7], 13: [150, 5, 61], 14: [120, 120, 70], 15: [8, 255, 51],

@@ -86,7 +86,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.statusBar().addPermanentWidget(self.progressbar)
 
         # Set username of labeler and show in statusbar
-        self.username = 'anonymous'
+        self.username = ''
         self.username_widget = QLabel(self.username)
         self.statusBar().addPermanentWidget(self.username_widget)
 
@@ -625,6 +625,8 @@ class MainWindow(QMainWindow, WindowMixin):
         self.binary_mode = bool(settings.get(SETTING_BINARY, True))
         self.framesToSkip = int(settings.get(SETTING_FRAMESTOSKIP, 0))
         self.copyprevpred = bool(settings.get(SETTING_COPYPREVPRED, False))
+        self.username = str(settings.get(SETTING_USERNAME, 'anonymous'))
+
         self.canvas.task_mode = self.task_mode
         self.label_font_size = int(settings.get(SETTING_LABEL_FONT_SIZE, 10))
         self.activeTaskMode()
@@ -1580,6 +1582,7 @@ class MainWindow(QMainWindow, WindowMixin):
         settings[SETTING_BINARY] = self.binary_mode
         settings[SETTING_FRAMESTOSKIP] = self.framesToSkip
         settings[SETTING_COPYPREVPRED] = self.copyprevpred
+        settings[SETTING_USERNAME] = self.username
 
         if self.defaultSaveDir is not None and len(self.defaultSaveDir) > 1:
             settings[SETTING_SAVE_DIR] = ustr(self.defaultSaveDir)
