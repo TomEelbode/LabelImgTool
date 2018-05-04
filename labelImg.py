@@ -1438,6 +1438,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
             if len(self.labelList) == 0:
                 # there is no annotation yet, go straight in annotation mode
+                self.toggleDrawingSensitive(True)
                 if self.task_mode == 0:
                     self.createRect()
                 elif self.task_mode == 1:
@@ -1790,6 +1791,11 @@ class MainWindow(QMainWindow, WindowMixin):
         self.actions.changeSavedir.setEnabled(False)
 
     def openPrevImg(self, _value=False):
+
+        if not self.canvas.editing():
+            # make sure next image is not shown when drawing
+            return
+
         if self.autoSaving is True and self.defaultSaveDir is not None:
             if self.dirty is True and self.hasLabels():
                 self.saveFile()
@@ -1833,6 +1839,11 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.loadFile(filename)
 
     def openNextImg(self, _value=False):
+
+        if not self.canvas.editing():
+            # make sure next image is not shown when drawing
+            return
+
         # Proceding next image without dialog if having any label
         if self.autoSaving is True and self.defaultSaveDir is not None and not self.image.isNull(
         ):
