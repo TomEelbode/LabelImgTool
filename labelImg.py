@@ -893,12 +893,12 @@ class MainWindow(QMainWindow, WindowMixin):
             for action in self.actions.onDETActive:
                 action.setEnabled(value)
 
-            self.createRect()
+            # self.createRect()
         if self.task_mode == 1:
             for action in self.actions.onSEGActive:
                 action.setEnabled(value)
 
-            self.createPolygon()
+            # self.createPolygon()
         if self.task_mode == 0:
             for action in self.actions.onCLSActive:
                 action.setEnabled(value)
@@ -1434,6 +1434,15 @@ class MainWindow(QMainWindow, WindowMixin):
                                            basename + '.txt')
                     self.loadCLSFile(txtPath)
 
+            if len(self.labelList) == 0:
+                # there is no annotation yet, go straight in annotation mode
+                if self.task_mode == 0:
+                    self.createRect()
+                elif self.task_mode == 1:
+                    self.createPolygon()
+            else:
+                self.toggleDrawingSensitive(False) # disable automatic drawing mode
+
             self.progressbar.setValue(self.getNumberOfAnnotatedFramesFromXML(xmlPath)*self.framesToSkip)
             return True
         else:
@@ -1486,6 +1495,8 @@ class MainWindow(QMainWindow, WindowMixin):
                 txtPath = os.path.join(self.defaultSaveDir,
                                        basename + '.txt')
                 self.loadCLSFile(txtPath)
+
+        self.toggleDrawingSensitive(False) # disable automatic drawing mode
 
         self.progressbar.setValue(self.getNumberOfAnnotatedFramesFromXML(xmlPath)*self.framesToSkip)
 
