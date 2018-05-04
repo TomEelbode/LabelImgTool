@@ -1918,11 +1918,10 @@ class MainWindow(QMainWindow, WindowMixin):
             formats.append('*.jpeg')
         filters = "Image & Label files (%s)" % \
                   ' '.join(formats + ['*%s' % LabelFile.suffix])
-        filename = unicode(
-            QFileDialog.getOpenFileName(
+        filename,_ = QFileDialog.getOpenFileName(
                 self, '%s - Choose Image or Label file' % __appname__, path,
-                filters))
-        if filename:
+                filters)
+        if filename is not None and filename.strip() != '':
             self.loadFile(filename)
 
     def saveFile(self, _value=False):
