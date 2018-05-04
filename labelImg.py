@@ -1803,6 +1803,8 @@ class MainWindow(QMainWindow, WindowMixin):
             if self.filename is None:
                 return
 
+            self.toggleDrawingSensitive(False) # disable automatic drawing mode
+
             currIndex = self.mImgList.index(self.filename)
             self.progressbar.setValue(currIndex-1)
             if currIndex - 1 >= 0:
@@ -1845,6 +1847,15 @@ class MainWindow(QMainWindow, WindowMixin):
                 filename = self.mImgList[0]
             else:
                 currIndex = self.mImgList.index(self.filename)
+
+                if len(self.labelList) == 0:
+                    # there is no annotation yet, go straight in annotation mode
+                    if self.task_mode == 0:
+                        self.createRect()
+                    elif self.task_mode == 1:
+                        self.createPolygon()
+                else:
+                    self.toggleDrawingSensitive(False)  # disable automatic drawing mode
 
                 self.progressbar.setValue(currIndex + 1)
                 if currIndex + 1 < len(self.mImgList):
