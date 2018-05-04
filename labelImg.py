@@ -537,6 +537,7 @@ class MainWindow(QMainWindow, WindowMixin):
             remote_mode=(loadOnlineImages, loadOnlineImages),
             createRect=createRect,
             delete=delete,
+            escape=escape,
             edit=edit,
             copy=copy,
             createpolygon=createPolygon,
@@ -1443,6 +1444,8 @@ class MainWindow(QMainWindow, WindowMixin):
                     self.createRect()
                 elif self.task_mode == 1:
                     self.createPolygon()
+
+                self.canvas.setFocus()
             else:
                 self.toggleDrawingSensitive(False) # disable automatic drawing mode
 
@@ -1500,6 +1503,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.loadCLSFile(txtPath)
 
         self.toggleDrawingSensitive(False) # disable automatic drawing mode
+        self.canvas.setFocus()
 
         self.progressbar.setValue(self.getNumberOfAnnotatedFramesFromXML(xmlPath)*self.framesToSkip)
 
@@ -1792,7 +1796,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
     def openPrevImg(self, _value=False):
 
-        if not self.canvas.editing():
+        if not self.canvas.editing() and self.canvas.current:
             # make sure next image is not shown when drawing
             return
 
@@ -1811,8 +1815,6 @@ class MainWindow(QMainWindow, WindowMixin):
             if self.filename is None:
                 return
 
-            self.toggleDrawingSensitive(False) # disable automatic drawing mode
-
             currIndex = self.mImgList.index(self.filename)
             self.progressbar.setValue(currIndex-1)
             if currIndex - 1 >= 0:
@@ -1820,7 +1822,22 @@ class MainWindow(QMainWindow, WindowMixin):
                 if filename:
                     self.loadFile(filename)
 
+                    if len(self.labelList) == 0:
+                        # there is no annotation yet, go straight in annotation mode
+                        self.toggleDrawingSensitive(True)
+                        if self.task_mode == 0:
+                            self.createRect()
+                        elif self.task_mode == 1:
+                            self.createPolygon()
+                        self.canvas.setFocus()
+                    else:
+                        self.toggleDrawingSensitive(False)  # disable automatic drawing mode
+
     def goToBeginning(self):
+        if not self.canvas.editing() and self.canvas.current:
+            # make sure next image is not shown when drawing
+            return
+
         if self.autoSaving is True and self.defaultSaveDir is not None and not self.image.isNull(
         ):
             if self.dirty is True or self.task_mode == 3:
@@ -1840,7 +1857,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
     def openNextImg(self, _value=False):
 
-        if not self.canvas.editing():
+        if not self.canvas.editing() and self.canvas.current:
             # make sure next image is not shown when drawing
             return
 
@@ -1861,15 +1878,6 @@ class MainWindow(QMainWindow, WindowMixin):
             else:
                 currIndex = self.mImgList.index(self.filename)
 
-                if len(self.labelList) == 0:
-                    # there is no annotation yet, go straight in annotation mode
-                    if self.task_mode == 0:
-                        self.createRect()
-                    elif self.task_mode == 1:
-                        self.createPolygon()
-                else:
-                    self.toggleDrawingSensitive(False)  # disable automatic drawing mode
-
                 self.progressbar.setValue(currIndex + 1)
                 if currIndex + 1 < len(self.mImgList):
                     filename = self.mImgList[currIndex + 1]
@@ -1880,6 +1888,18 @@ class MainWindow(QMainWindow, WindowMixin):
 
             if filename:
                 self.loadFile(filename)
+
+                if len(self.labelList) == 0:
+                    # there is no annotation yet, go straight in annotation mode
+                    self.toggleDrawingSensitive(True)
+                    if self.task_mode == 0:
+                        self.createRect()
+                    elif self.task_mode == 1:
+                        self.createPolygon()
+
+                    self.canvas.setFocus()
+                else:
+                    self.toggleDrawingSensitive(False)  # disable automatic drawing mode
 
     def openFile(self, _value=False):
         if not self.mayContinue():

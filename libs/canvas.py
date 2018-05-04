@@ -597,6 +597,8 @@ class Canvas(QWidget):
             print "ESC press"
             self.drawingPolygon.emit(False)
             self.update()
+        else:
+            print key
 
     def setLastLabel(self, text):
         assert text
