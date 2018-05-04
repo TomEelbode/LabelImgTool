@@ -1832,6 +1832,8 @@ class MainWindow(QMainWindow, WindowMixin):
                         self.canvas.setFocus()
                     else:
                         self.toggleDrawingSensitive(False)  # disable automatic drawing mode
+                        self.canvas.setFocus()
+
 
     def goToBeginning(self):
         if not self.canvas.editing() and self.canvas.current:
@@ -1900,6 +1902,7 @@ class MainWindow(QMainWindow, WindowMixin):
                     self.canvas.setFocus()
                 else:
                     self.toggleDrawingSensitive(False)  # disable automatic drawing mode
+                    self.canvas.setFocus()
 
     def openFile(self, _value=False):
         if not self.mayContinue():
