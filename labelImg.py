@@ -1801,7 +1801,7 @@ class MainWindow(QMainWindow, WindowMixin):
             return
 
         if self.autoSaving is True and self.defaultSaveDir is not None:
-            if self.dirty is True and self.hasLabels():
+            if self.dirty is True:
                 self.saveFile()
         #if not self.mayContinue():
         #    return
@@ -1833,7 +1833,6 @@ class MainWindow(QMainWindow, WindowMixin):
                     else:
                         self.toggleDrawingSensitive(False)  # disable automatic drawing mode
                         self.canvas.setFocus()
-
 
     def goToBeginning(self):
         if not self.canvas.editing() and self.canvas.current:
@@ -2038,7 +2037,7 @@ class MainWindow(QMainWindow, WindowMixin):
     def deleteSelectedShape(self):
         yes, no = QMessageBox.Yes, QMessageBox.No
         msg = u'You are about to permanently delete this Box, proceed anyway?'
-        if yes == QMessageBox.warning(self, u'Attention', msg, yes | no):
+        if yes == QMessageBox.warning(self, u'Attention', msg, yes | no, no):
             self.remLabel(
                 shape=self.canvas.deleteSelected(), label=self.selectedLabel)
 
