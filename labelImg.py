@@ -225,7 +225,7 @@ class MainWindow(QMainWindow, WindowMixin):
         # self.brush_dock.setObjectName(u'Brush')
         # self.brush_dock.setWidget(self.brush_widget)
 
-        # # select a label
+        # select a label
         # self.labelListWidget = QListWidget()
         # self.labelListWidget.itemDoubleClicked.connect(
         #     self.labelitemDoubleClicked)
@@ -241,7 +241,7 @@ class MainWindow(QMainWindow, WindowMixin):
         # self.labelSelectDock.setWidget(self.labelListContainer)
         # if self.task_mode != 2:
         #     self.labelSelectDock.setEnabled(False)
-        # # label color map dock
+        # label color map dock
         # self.label_color_list.itemDoubleClicked.connect(
         #     self.labelColorDoubleClicked)
         # label_color_layout = QVBoxLayout()
@@ -1035,7 +1035,8 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             shape = self.canvas.selectedShape
             if shape:
-                self.labelList.setItemSelected(self.shapesToItems[shape], True)
+                self.shapesToItems[shape].setSelected(True)
+                # self.labelList.setItemSelected(self.shapesToItems[shape], True)
             else:
                 self.labelList.clearSelection()
         self.actions.delete.setEnabled(selected)
