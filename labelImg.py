@@ -537,7 +537,6 @@ class MainWindow(QMainWindow, WindowMixin):
             remote_mode=(loadOnlineImages, loadOnlineImages),
             createRect=createRect,
             delete=delete,
-            escape=escape,
             edit=edit,
             copy=copy,
             createpolygon=createPolygon,
@@ -1449,7 +1448,7 @@ class MainWindow(QMainWindow, WindowMixin):
             else:
                 self.toggleDrawingSensitive(False) # disable automatic drawing mode
 
-            self.progressbar.setValue(self.getNumberOfAnnotatedFramesFromXML(xmlPath)*self.framesToSkip)
+            self.progressbar.setValue(self.frame_grabber.get_position())
             return True
         else:
             QMessageBox.about(self, "No more images!",
@@ -1505,7 +1504,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.toggleDrawingSensitive(False) # disable automatic drawing mode
         self.canvas.setFocus()
 
-        self.progressbar.setValue(self.getNumberOfAnnotatedFramesFromXML(xmlPath)*self.framesToSkip)
+        self.progressbar.setValue(self.frame_grabber.get_position())
 
         return True
 
