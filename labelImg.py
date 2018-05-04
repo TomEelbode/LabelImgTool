@@ -1758,40 +1758,40 @@ class MainWindow(QMainWindow, WindowMixin):
         if dirpath is not None and len(dirpath) > 1:
             self.lastOpenDir = dirpath
 
-        self.dirname = dirpath
-        if '/' in dirpath:
-            path_elem = dirpath.split('/')[:-2]
-            last_path_elem = dirpath.split('/')[-1]
-            s = '/'
-            # self.defaultSaveDir = s.join(
-            #     path_elem) + '/Annotation' + '/' + last_path_elem + '/'
-            self.defaultSaveDir = dirpath + '/Annotation/' + str(
-                self.username) + '/'
-            if not os.path.exists(self.defaultSaveDir):
-                os.makedirs(self.defaultSaveDir)
-                # for windows
-        elif '\\' in dirpath:
-            path_elem = dirpath.split('\\')[:-1]
-            last_path_elem = dirpath.split('\\')[-1]
-            s = '\\'
-            self.defaultSaveDir = s.join(
-                path_elem) + '\\Annotation' + '\\' + last_path_elem + '\\'
-            if not os.path.exists(self.defaultSaveDir):
-                os.makedirs(self.defaultSaveDir)
-        self.statusBar().showMessage('%s . Annotation will be saved to %s' %
-                                     ('Change saved folder',
-                                      self.defaultSaveDir))
-        self.statusBar().show()
-        self.mImgList = self.scanAllImages(dirpath)
+            self.dirname = dirpath
+            if '/' in dirpath:
+                path_elem = dirpath.split('/')[:-2]
+                last_path_elem = dirpath.split('/')[-1]
+                s = '/'
+                # self.defaultSaveDir = s.join(
+                #     path_elem) + '/Annotation' + '/' + last_path_elem + '/'
+                self.defaultSaveDir = dirpath + '/Annotation/' + str(
+                    self.username) + '/'
+                if not os.path.exists(self.defaultSaveDir):
+                    os.makedirs(self.defaultSaveDir)
+                    # for windows
+            elif '\\' in dirpath:
+                path_elem = dirpath.split('\\')[:-1]
+                last_path_elem = dirpath.split('\\')[-1]
+                s = '\\'
+                self.defaultSaveDir = s.join(
+                    path_elem) + '\\Annotation' + '\\' + last_path_elem + '\\'
+                if not os.path.exists(self.defaultSaveDir):
+                    os.makedirs(self.defaultSaveDir)
+            self.statusBar().showMessage('%s . Annotation will be saved to %s' %
+                                         ('Change saved folder',
+                                          self.defaultSaveDir))
+            self.statusBar().show()
+            self.mImgList = self.scanAllImages(dirpath)
 
-        self.progressbar.setRange(0,len(self.mImgList))
-        self.filename = None
-        self.openNextImg()
-        for imgPath in self.mImgList:
-            item = QListWidgetItem(imgPath)
-            self.fileListWidget.addItem(item)
+            self.progressbar.setRange(0,len(self.mImgList))
+            self.filename = None
+            self.openNextImg()
+            for imgPath in self.mImgList:
+                item = QListWidgetItem(imgPath)
+                self.fileListWidget.addItem(item)
 
-        self.actions.changeSavedir.setEnabled(False)
+            self.actions.changeSavedir.setEnabled(False)
 
     def openPrevImg(self, _value=False):
 
@@ -2229,7 +2229,8 @@ class MainWindow(QMainWindow, WindowMixin):
         filename,_ = QFileDialog.getOpenFileName(
                 self, '%s - Choose Image or Label file' % __appname__, path,
                 filters)
-        if filename is not None:
+
+        if filename is not None and filename.strip() != '':
 
             self.actions.changeSavedir.setEnabled(False)
 
@@ -2248,7 +2249,6 @@ class MainWindow(QMainWindow, WindowMixin):
 
             self.video_mode = True
             self.video_filename = filename
-            print filename
             self.frame_grabber = FrameGrabber(filename)
 
             print "Video loaded with " + str(self.frame_grabber.get_nframes(
@@ -2261,27 +2261,27 @@ class MainWindow(QMainWindow, WindowMixin):
             # self.showNextFrame()
             self.showPrevFrame() # if you use shownextframe, the starting frame is not correct=
 
-        config = {
-            'framestoskip': self.framesToSkip,
-            'copyprevpred': self.copyprevpred
-        }
-        dialog = NewVideoDialog(parent=self, frameGrabber=self.frame_grabber, config=config)
-        if dialog.exec_():
-            self.framesToSkip = dialog.get_framesToSkip()
-            self.copyprevpred = dialog.get_copyprevpred()
-            overwritable = dialog.get_overwritable()
-        dialog.destroy()
+            config = {
+                'framestoskip': self.framesToSkip,
+                'copyprevpred': self.copyprevpred
+            }
+            dialog = NewVideoDialog(parent=self, frameGrabber=self.frame_grabber, config=config)
+            if dialog.exec_():
+                self.framesToSkip = dialog.get_framesToSkip()
+                self.copyprevpred = dialog.get_copyprevpred()
+                overwritable = dialog.get_overwritable()
+            dialog.destroy()
 
-        # get labelfile
-        imgFileName = os.path.basename(self.filename)
-        savedFileName = os.path.splitext(imgFileName)[0] + LabelFile.suffix
-        savedPath = os.path.join(str(self.defaultSaveDir), savedFileName)
+            # get labelfile
+            imgFileName = os.path.basename(self.filename)
+            savedFileName = os.path.splitext(imgFileName)[0] + LabelFile.suffix
+            savedPath = os.path.join(str(self.defaultSaveDir), savedFileName)
 
-        if overwritable and os.path.exists(savedPath):
-            os.remove(savedPath)
-            self.showPrevFrame()
+            if overwritable and os.path.exists(savedPath):
+                os.remove(savedPath)
+                self.showPrevFrame()
 
-        self.annotated_frames = self.getNumberOfAnnotatedFramesFromXML(savedPath)
+            self.annotated_frames = self.getNumberOfAnnotatedFramesFromXML(savedPath)
 
 
 class Settings(object):
