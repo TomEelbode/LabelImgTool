@@ -1,7 +1,8 @@
 from math import sqrt
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 
 
 def newIcon(icon):
@@ -18,8 +19,14 @@ def newButton(text, icon=None, slot=None):
     return b
 
 
-def newAction(parent, text, slot=None, shortcut=None, icon=None,
-              tip=None, checkable=False, enabled=True):
+def newAction(parent,
+              text,
+              slot=None,
+              shortcut=None,
+              icon=None,
+              tip=None,
+              checkable=False,
+              enabled=True):
     """Create a new action and assign callbacks, shortcuts, etc."""
     a = QAction(text, parent)
     if icon is not None:
@@ -55,7 +62,6 @@ def labelValidator():
 
 
 class struct(object):
-
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 

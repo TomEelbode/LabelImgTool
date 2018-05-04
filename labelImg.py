@@ -14,8 +14,9 @@ import cv2
 
 import qdarkstyle
 import requests
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 from libs.constants import *
 from libs.ustr import ustr
 
@@ -95,8 +96,7 @@ class MainWindow(QMainWindow, WindowMixin):
         # info display
         self.display_timer = QTimer()
         self.display_timer.start(1000)
-        QObject.connect(self.display_timer, SIGNAL("timeout()"),
-                        self.info_display)
+        self.display_timer.timeout.connect(self.info_display)
         # label color map
         self.label_font_size = 10
         self.label_color_map = []
@@ -186,7 +186,7 @@ class MainWindow(QMainWindow, WindowMixin):
         # self.dock.setObjectName(u'Labels')
         # self.dock.setWidget(self.labelListContainer)
         # # add file list add dock to move faster
-        # self.fileListWidget = QListWidget()
+        self.fileListWidget = QListWidget()
         # self.fileListWidget.itemDoubleClicked.connect(
         #     self.fileitemDoubleClicked)
         # filelistLayout = QVBoxLayout()
@@ -572,11 +572,13 @@ class MainWindow(QMainWindow, WindowMixin):
             onShapesPresent=(saveAs, hideAll, showAll))
 
         #tool menus settings
+        menubar = self.menuBar()
+        # menubar.setNativeMenuBar(False)
         self.menus = struct(
-            file=self.menu('&File'),
-            edit=self.menu('&Edit'),
-            view=self.menu('&View'),
-            help=self.menu('&Help'),
+            file=menubar.addMenu('&File'),
+            edit=menubar.addMenu('&Edit'),
+            view=menubar.addMenu('&View'),
+            help=menubar.addMenu('&Help'),
             recentFiles=QMenu('Open &Recent'),
             labelList=labelMenu)
         for item in self.actions.remote_mode:
@@ -2182,7 +2184,6 @@ class MainWindow(QMainWindow, WindowMixin):
                 annotated_frames.append(frame)
         return len(annotated_frames)
 
-
     def loadVideo(self):
         print "Loading video"
 
@@ -2195,10 +2196,9 @@ class MainWindow(QMainWindow, WindowMixin):
 
         filters = "Video files (%s)" % \
                   ' '.join(formats + ['*%s' % LabelFile.suffix])
-        filename = unicode(
-            QFileDialog.getOpenFileName(
+        filename,_ = QFileDialog.getOpenFileName(
                 self, '%s - Choose Image or Label file' % __appname__, path,
-                filters))
+                filters)
         if filename is not None:
 
             self.actions.changeSavedir.setEnabled(False)
@@ -2218,6 +2218,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
             self.video_mode = True
             self.video_filename = filename
+            print filename
             self.frame_grabber = FrameGrabber(filename)
 
             print "Video loaded with " + str(self.frame_grabber.get_nframes(
@@ -2251,6 +2252,7 @@ class MainWindow(QMainWindow, WindowMixin):
             self.showPrevFrame()
 
         self.annotated_frames = self.getNumberOfAnnotatedFramesFromXML(savedPath)
+
 
 class Settings(object):
     """Convenience dict-like wrapper around QSettings."""
@@ -2294,7 +2296,8 @@ def read(filename, default=None):
 def main(argv):
     """Standard boilerplate Qt application code."""
     app = QApplication(argv)
-    app.setStyleSheet(qdarkstyle.load_stylesheet(pyside=False))
+    # app.setStyleSheet(qdarkstyle.load_stylesheet(pyside=False))
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     app.setApplicationName(__appname__)
     app.setWindowIcon(newIcon("app"))
     win = MainWindow(argv[1] if len(argv) == 2 else None)

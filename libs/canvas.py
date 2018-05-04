@@ -1,6 +1,7 @@
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-#from PyQt4.QtOpenGL import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+#from PyQt5.QtOpenGL import *
 
 from shape import Shape
 from lib import distance
@@ -113,7 +114,7 @@ class Canvas(QWidget):
 
     def mouseMoveEvent(self, ev):
         """Update line with last point and current coordinates."""
-        pos = self.transformPos(ev.posF())
+        pos = self.transformPos(ev.localPos())
         self.restoreCursor()
         if self.task_mode == 3:
             self.brush_point = pos
@@ -128,7 +129,6 @@ class Canvas(QWidget):
                     self.current_brush_path.lineTo(pos)
             self.repaint()
             return
-
 
         # Polygon drawing.
         if self.drawing():
@@ -213,7 +213,7 @@ class Canvas(QWidget):
             self.hVertex, self.hShape = None, None
 
     def mousePressEvent(self, ev):
-        pos = self.transformPos(ev.posF())
+        pos = self.transformPos(ev.localPos())
         if ev.button() == Qt.LeftButton:
             if self.drawing():
                 if self.shape_type == self.POLYGON_SHAPE and self.current:
@@ -597,7 +597,7 @@ class Canvas(QWidget):
             print "ESC press"
             self.drawingPolygon.emit(False)
             self.update()
-            
+
     def setLastLabel(self, text):
         assert text
         self.shapes[-1].label = text

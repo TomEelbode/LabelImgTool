@@ -6,7 +6,7 @@ addons:
   apt:
     packages:
     - cmake
-    - pyqt4-dev-tools
+    - PyQt5-dev-tools
 
 # command to install dependencies
 #install: "pip install --user -r requirements.txt"

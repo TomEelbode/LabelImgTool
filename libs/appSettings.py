@@ -1,6 +1,7 @@
 import pickle
 import os
 
+
 class APPSettings(object):
     def __init__(self):
         self.data = {}
@@ -29,4 +30,3 @@ class APPSettings(object):
                 self.data = pickle.load(f)
                 return True
         return False
-

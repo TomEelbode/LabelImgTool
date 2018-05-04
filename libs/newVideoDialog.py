@@ -1,12 +1,13 @@
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtGui import *
-from PyQt4.QtCore import Qt
+from PyQt5 import QtGui, QtCore, QtWidgets
+from PyQt5.QtGui import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import *
 from FrameGrabber import FrameGrabber
 from lib import newIcon
 BB = QDialogButtonBox
 
 
-class NewVideoDialog(QDialog):
+class NewVideoDialog(QtWidgets.QDialog):
     """docstring for NewVideoDialog"""
     framestoskip = 0
     copyprevpred = False
@@ -47,7 +48,6 @@ class NewVideoDialog(QDialog):
         hline.setFrameShape(QFrame.HLine)
         hline2.setFrameShadow(QFrame.Sunken)
 
-
         # Input how many frames to skip for annotation
         self.framestoskip = QLineEdit(parent=parent)
         self.framestoskip.setValidator(QIntValidator())
@@ -63,13 +63,13 @@ class NewVideoDialog(QDialog):
         bb.rejected.connect(self.reject)
 
         # Check button indicating whether or not to copy previous prediction
-        self.copyprevpred_cb = QtGui.QCheckBox("Copy last frame's prediction")
+        self.copyprevpred_cb = QCheckBox("Copy last frame's prediction")
         self.copyprevpred_cb.setChecked(self.__class__.copyprevpred)
         self.copyprevpred_cb.stateChanged.connect(self.change_copyprevpred)
 
         # Check button indicating whether or not to overwrite already existing
         # label file
-        self.overwrite_cb = QtGui.QCheckBox("Overwrite existing label file")
+        self.overwrite_cb = QCheckBox("Overwrite existing label file")
         self.overwrite_cb.setChecked(self.__class__.overwrite)
         self.overwrite_cb.stateChanged.connect(self.change_overwrite)
 
@@ -99,7 +99,7 @@ class NewVideoDialog(QDialog):
         self.show()
 
     def get_framesToSkip(self):
-        return int(self.framestoskip.text().trimmed())
+        return int(self.framestoskip.text().strip())
 
     def get_copyprevpred(self):
         return self.__class__.copyprevpred
@@ -121,5 +121,3 @@ class NewVideoDialog(QDialog):
             self.__class__.overwrite = True
         else:
             self.__class__.overwrite = False
-
-

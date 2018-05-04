@@ -4,8 +4,8 @@ from xml.etree.ElementTree import Element, SubElement
 from xml.dom import minidom
 from lxml import etree
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from libs.shape import Shape
 
 
@@ -38,7 +38,7 @@ class PascalVocWriter:
 
             print shapes
             for label, points, line_color, fill_color, shape_type, instance_id, frame in shapes:
-                if not frame == self.framegrabber.get_position():
+                if self.framegrabber is not None and not frame == self.framegrabber.get_position():
                     if self.shape_type == 'RECT':
                         self.addBndBox(points[0][0], points[0][1], points[2][0], points[2][1], label, frame)
                     else:
@@ -240,6 +240,8 @@ class PascalVocReader:
 
                 if object_iter.find('frame') is not None:
                     frame = int(object_iter.find('frame').text)
+                else:
+                    frame = None
 
                 for rect in rects:
                     self.addShape(label, rect, frame=frame)

@@ -30,15 +30,15 @@ Brush SEG mode(in development: brush branch)
 
 ## Build source and use it
 
-Requires at least [Python 2.6](http://www.python.org/getit/) and has been tested with [PyQt4.8](http://www.riverbankcomputing.co.uk/software/pyqt/intro).
+Requires at least [Python 2.6](http://www.python.org/getit/) and has been tested with [PyQt5.8](http://www.riverbankcomputing.co.uk/software/pyqt/intro).
 
-In order to build the resource and assets, you need to install pyqt4-dev-tools:
+In order to build the resource and assets, you need to install PyQt5-dev-tools:
 
 * Ubuntu
 
-`sudo apt-get install pyqt4-dev-tools`
+`sudo apt-get install PyQt5-dev-tools`
 * Mac
-   install pyqt4 with [instructions](https://robonobodojo.wordpress.com/2017/02/08/installing-pyqt4-on-mac-osx/)
+   install PyQt5 with [instructions](https://robonobodojo.wordpress.com/2017/02/08/installing-PyQt5-on-mac-osx/)
 
 `sudo apt-get install python-opencv`
 
@@ -50,9 +50,9 @@ In order to build the resource and assets, you need to install pyqt4-dev-tools:
 
 * Windows
 
-Need to download and setup [Python 2.6](https://www.python.org/downloads/windows/) or later and [PyQt4](https://www.riverbankcomputing.com/software/pyqt/download),lxml,qdarkstyle. You can also try to download the whole neccessary executable files from [my drive](https://copy.com/oyYjFzJwPb4tKl93) and install them.
+Need to download and setup [Python 2.6](https://www.python.org/downloads/windows/) or later and [PyQt5](https://www.riverbankcomputing.com/software/pyqt/download),lxml,qdarkstyle. You can also try to download the whole neccessary executable files from [my drive](https://copy.com/oyYjFzJwPb4tKl93) and install them.
 
-Open cmd and go to $labelImg, 
+Open cmd and go to $labelImg,
 
 `$ pyrcc4 -o resources.py resources.qrc`
 
@@ -70,7 +70,7 @@ Open cmd and go to $labelImg,
 
 ​          |---images_1
 
-​          |---images_2        
+​          |---images_2
 
 the file containing annotations will be created by default.
 
@@ -92,7 +92,7 @@ support rectangle label and parsing labels
 
 You can edit the [data/predefined_classes.txt](https://github.com/tzutalin/labelImg/blob/master/data/predefined_classes.txt) to load pre-defined classes
 
-You also can create labels with two levels in [data/predefined_sub_classes.txt](https://github.com/lzx1413/labelImg/blob/master/data/predefined_sub_classes.txt) 
+You also can create labels with two levels in [data/predefined_sub_classes.txt](https://github.com/lzx1413/labelImg/blob/master/data/predefined_sub_classes.txt)
 
 And the labels will be ranked by the frequency you use it.
 

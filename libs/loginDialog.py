@@ -1,6 +1,6 @@
-from PyQt4.QtGui import QDialog, QVBoxLayout, QLabel, QLineEdit, \
- QDialogButtonBox
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 
 from lib import newIcon
 BB = QDialogButtonBox
@@ -30,9 +30,9 @@ class LoginDialog(QDialog):
         self.setLayout(layout)
 
     def validate(self):
-        if self.edit.text().trimmed():
+        if self.edit.text().strip():
             self.accept()
 
     def get_username(self):
         print self.edit.text()
-        return self.edit.text().trimmed()
+        return self.edit.text().strip()
