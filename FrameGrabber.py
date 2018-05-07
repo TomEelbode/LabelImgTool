@@ -13,7 +13,7 @@ class FrameGrabber():
         self.infos = ffmpeg_parse_info(fp, fps_source='fps')
 
         if verbose:
-            print self.infos
+            print(self.infos)
 
         self.command = [
             FFMPEG_BIN, '-i', fp, '-f', 'image2pipe', '-pix_fmt', 'rgb24',

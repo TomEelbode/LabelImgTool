@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import *
 
 
 def newIcon(icon):
-    result = QIcon('icons/' + icon + '.png')
+    result = QIcon(':/' + icon)
     return result
 
 

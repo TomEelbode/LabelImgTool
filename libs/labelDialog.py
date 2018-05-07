@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from lib import newIcon, labelValidator
+from libs.lib import newIcon, labelValidator
 
 BB = QDialogButtonBox
 
@@ -29,7 +29,7 @@ class SubListWidget(QDialog):
     def listItemDoubleClicked(self, tQListWidgetItem):
         text = tQListWidgetItem.text().trimmed()
         self.select_text = text
-        print text
+        print(text)
         if text is not None:
             self.accept()
 
@@ -70,7 +70,7 @@ class LabelDialog(QDialog):
         elif listItem:
             sorted_labels = []
             if self.label_fre_dic:
-                print label_fre_dic
+                print(label_fre_dic)
                 sorted_labels = sorted(
                     self.label_fre_dic,
                     key=self.label_fre_dic.get,
@@ -100,8 +100,8 @@ class LabelDialog(QDialog):
         return self.edit.text() if self.exec_() else None
 
     def sublistwidgetclicked(self, tQListWidgetItem):
-        print tQListWidgetItem.text().trimmed()
-        print 'doubleclicked'
+        print(tQListWidgetItem.text().trimmed())
+        print('doubleclicked')
 
     def listItemDoubleClicked(self, tQListWidgetItem):
         text = tQListWidgetItem.text().trimmed()

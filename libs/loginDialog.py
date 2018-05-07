@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from lib import newIcon
+from libs.lib import newIcon
 BB = QDialogButtonBox
 
 
@@ -34,5 +34,5 @@ class LoginDialog(QDialog):
             self.accept()
 
     def get_username(self):
-        print self.edit.text()
+        print(self.edit.text())
         return self.edit.text().strip()
