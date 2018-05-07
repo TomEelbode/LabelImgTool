@@ -124,7 +124,7 @@ def ffmpeg_parse_info(fp, check_duration=True, fps_source='tbr'):
     infos = pipe.stderr.read()
 
     lines = infos.splitlines()
-    if "No such file or directory" in lines[-1]:
+    if b'No such file or directory' in lines[-1]:
         raise IOError(("The file %s could not be found!\n"
                        "Please check that you entered the correct "
                        "path.") % fp)
@@ -136,15 +136,15 @@ def ffmpeg_parse_info(fp, check_duration=True, fps_source='tbr'):
 
     if check_duration:
         try:
-            keyword = 'Duration: '
+            keyword = b'Duration: '
             index = 0
             line = [l for l in lines if keyword in l][index]
-            match = re.findall("([0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9])",
+            match = re.findall(b'([0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9][0-9])',
                                line)[0]
             ftr = [3600, 60, 1]
 
             result['duration'] = sum(
-                [a * b for a, b in zip(ftr, map(float, match.split(':')))])
+                [a * b for a, b in zip(ftr, map(float, match.split(b':')))])
         except:
             raise IOError(
                 ("MoviePy error: failed to read the duration of file %s.\n"
@@ -153,7 +153,7 @@ def ffmpeg_parse_info(fp, check_duration=True, fps_source='tbr'):
 
     # get the output line that speaks about video
     lines_video = [
-        l for l in lines if ' Video: ' in l and re.search('\d+x\d+', l)
+        l for l in lines if b' Video: ' in l and re.search(b'\d+x\d+', l)
     ]
 
     result['video_found'] = (lines_video != [])
@@ -163,8 +163,8 @@ def ffmpeg_parse_info(fp, check_duration=True, fps_source='tbr'):
             line = lines_video[0]
 
             # get the size, of the form 460x320 (w x h)
-            match = re.search(" [0-9]*x[0-9]*(,| )", line)
-            s = list(map(int, line[match.start():match.end() - 1].split('x')))
+            match = re.search(b'[0-9]*x[0-9]*(,| )', line)
+            s = list(map(int, line[match.start():match.end() - 1].split(b'x')))
             result['video_size'] = s
         except:
             raise IOError(
@@ -181,18 +181,18 @@ def ffmpeg_parse_info(fp, check_duration=True, fps_source='tbr'):
         # replace by x*1000/1001 (very common case for the fps).
 
         def get_tbr():
-            match = re.search("( [0-9]*.| )[0-9]* tbr", line)
+            match = re.search(b'( [0-9]*.| )[0-9]* tbr', line)
 
             # Sometimes comes as e.g. 12k. We need to replace that with 12000.
-            s_tbr = line[match.start():match.end()].split(' ')[1]
-            if "k" in s_tbr:
-                tbr = float(s_tbr.replace("k", "")) * 1000
+            s_tbr = line[match.start():match.end()].split(b' ')[1]
+            if b'k' in s_tbr:
+                tbr = float(s_tbr.replace(b'k', b'')) * 1000
             else:
                 tbr = float(s_tbr)
             return tbr
 
         def get_fps():
-            match = re.search("( [0-9]*.| )[0-9]* fps", line)
+            match = re.search(b'( [0-9]*.| )[0-9]* fps', line)
             fps = float(line[match.start():match.end()].split(' ')[1])
             return fps
 

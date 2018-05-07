@@ -137,7 +137,7 @@ class PascalVocWriter:
             object_item = SubElement(top, 'object')
             if each_object['name']:
                 name = SubElement(object_item, 'name')
-                name.text = unicode(each_object['name'])
+                name.text = str(each_object['name'])
 
             if self.framegrabber is not None:
                 # record which frame this object belongs to
@@ -169,7 +169,7 @@ class PascalVocWriter:
                 ymax.text = str(each_object['ymax'])
             elif self.shape_type == 'POLYGON':
                 polygon = SubElement(object_item, 'polygon')
-                for i in xrange(int(each_object['point_num'])):
+                for i in range(int(each_object['point_num'])):
                     point = SubElement(polygon, 'point' + str(i))
                     point.text = str(int(each_object[i][0])) + ',' + str(
                         int(each_object[i][1]))
@@ -183,7 +183,7 @@ class PascalVocWriter:
             out_file = open(self.filename + '.xml', 'w')
         else:
             out_file = open(targetFile, 'w')
-        out_file.write(self.prettify(root))
+        out_file.write(str(self.prettify(root).decode('utf8')))
         # out_file.write(root)
         out_file.close()
 

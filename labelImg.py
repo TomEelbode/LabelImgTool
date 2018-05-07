@@ -841,8 +841,8 @@ class MainWindow(QMainWindow, WindowMixin):
         item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
         item.setCheckState(Qt.Checked)
         self.labelList.addItem(item)
-        self.itemsToShapes[item] = label
-        self.shapesToItems[label] = item
+        self.itemsToShapes[id(item)] = label
+        self.shapesToItems[id(label)] = item
         self.labelList.addItem(item)
         self.setDirty()
 
@@ -1035,7 +1035,7 @@ class MainWindow(QMainWindow, WindowMixin):
         else:
             shape = self.canvas.selectedShape
             if shape:
-                self.shapesToItems[shape].setSelected(True)
+                self.shapesToItems[id(shape)].setSelected(True)
                 # self.labelList.setItemSelected(self.shapesToItems[shape], True)
             else:
                 self.labelList.clearSelection()
@@ -1050,27 +1050,27 @@ class MainWindow(QMainWindow, WindowMixin):
         item = QListWidgetItem(shape.label)
         item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
         item.setCheckState(Qt.Checked)
-        self.itemsToShapes[item] = shape
-        self.shapesToItems[shape] = item
+        self.itemsToShapes[id(item)] = shape
+        self.shapesToItems[id(shape)] = item
         self.labelList.addItem(item)
         for action in self.actions.onShapesPresent:
             action.setEnabled(True)
 
     def remLabel(self, shape=None, label=None):
         if self.task_mode in [0, 1]:
-            item = self.shapesToItems[shape]
+            item = self.shapesToItems[id(shape)]
             temp = self.labelList.takeItem(self.labelList.row(item))
             temp = None
-            del self.shapesToItems[shape]
-            del self.itemsToShapes[item]
+            del self.shapesToItems[id(shape)]
+            del self.itemsToShapes[id(item)]
         elif self.task_mode == 2:
             items = self.labelList.selectedItems()
             for item in items:
                 temp = self.labelList.takeItem(self.labelList.row(item))
                 temp = None
             self.currentItemLabels.remove(label)
-            del self.shapesToItems[label]
-            del self.itemsToShapes[item]
+            del self.shapesToItems[id(label)]
+            del self.itemsToShapes[id(item)]
 
     def loadLabels(self, shapes, forward=False):
         s = []
@@ -1206,13 +1206,13 @@ class MainWindow(QMainWindow, WindowMixin):
         if self.task_mode in [0, 1]:
             if item and self.canvas.editing():
                 self._noSelectionSlot = True
-                self.canvas.selectShape(self.itemsToShapes[item])
+                self.canvas.selectShape(self.itemsToShapes[id(item)])
         elif self.task_mode == 2:
             if item:
-                self.selectedLabel = self.itemsToShapes[item]
+                self.selectedLabel = self.itemsToShapes[id(item)]
 
     def labelItemChanged(self, item):
-        shape = self.itemsToShapes[item]
+        shape = self.itemsToShapes[id(item)]
         label = str(item.text())
         if label != shape.label:
             shape.label = str(item.text())
@@ -1327,7 +1327,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
     def togglePolygons(self, value):
         for item, shape in self.itemsToShapes.iteritems():
-            item.setCheckState(Qt.Checked if value else Qt.Unchecked)
+            self.shapesToItems[id(shape)].setCheckState(Qt.Checked if value else Qt.Unchecked)
 
     def loadCLSFile(self, filepath):
         if os.path.exists(filepath):
