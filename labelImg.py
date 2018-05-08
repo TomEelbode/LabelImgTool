@@ -1135,7 +1135,6 @@ class MainWindow(QMainWindow, WindowMixin):
                 shape_type=s.shape_type)
 
         shapes = [format_shape(shape) for shape in self.canvas.shapes]
-        print('shape type' + str(self.shape_type))
         imgFileName = os.path.basename(self.filename)
         if self.task_mode == 1:  #seg mode
             with open(self.defaultSaveDir + 'label_num_dic.json',
@@ -1447,7 +1446,9 @@ class MainWindow(QMainWindow, WindowMixin):
 
                 self.canvas.setFocus()
             else:
+                self.canvas.setEditing(False)
                 self.toggleDrawingSensitive(False) # disable automatic drawing mode
+                self.canvas.setFocus()
 
             self.progressbar.setValue(self.frame_grabber.get_position())
             return True
@@ -1502,6 +1503,7 @@ class MainWindow(QMainWindow, WindowMixin):
                                        basename + '.txt')
                 self.loadCLSFile(txtPath)
 
+        self.canvas.setEditing(False)
         self.toggleDrawingSensitive(False) # disable automatic drawing mode
         self.canvas.setFocus()
 
@@ -2035,6 +2037,21 @@ class MainWindow(QMainWindow, WindowMixin):
             self.setDirty()
 
     def deleteSelectedShape(self):
+
+        def format_shape(s):
+            if isinstance(s.fill_color, list):
+                s.fill_color = QColor(s.fill_color[0], s.fill_color[1],
+                                      s.fill_color[2], s.fill_color[3])
+            return dict(
+                label=str(s.label),
+                instance_id=s.instance_id,
+                line_color=s.line_color.getRgb()
+                if s.line_color != self.lineColor else None,
+                fill_color=s.fill_color.getRgb()
+                if s.fill_color != self.fillColor else None,
+                points=[(p.x(), p.y()) for p in s.points],
+                shape_type=s.shape_type)
+
         yes, no = QMessageBox.Yes, QMessageBox.No
         msg = u'You are about to permanently delete this Box, proceed anyway?'
         if yes == QMessageBox.warning(self, u'Attention', msg, yes | no, no):

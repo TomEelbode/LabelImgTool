@@ -36,7 +36,6 @@ class PascalVocWriter:
             reader = PascalVocReader(savefilename)
             shapes = reader.getShapes()
 
-            print(shapes)
             for label, points, line_color, fill_color, shape_type, instance_id, frame in shapes:
                 if self.framegrabber is not None and not frame == self.framegrabber.get_position():
                     if self.shape_type == 'RECT':
