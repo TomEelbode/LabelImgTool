@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
-import codecs
 import json
 import logging
 import os.path
@@ -37,6 +36,7 @@ from libs.loginDialog import LoginDialog
 from libs.newVideoDialog import NewVideoDialog
 from libs.saveMaskImage import label_mask_writer
 import resources
+import codecs
 
 from FrameGrabber import FrameGrabber
 
