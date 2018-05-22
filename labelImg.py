@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
-import json
 import logging
 import os.path
 import re
@@ -39,7 +38,7 @@ import resources
 import codecs
 
 from FrameGrabber import FrameGrabber
-
+import json
 __appname__ = 'labelImgPlus'
 
 
